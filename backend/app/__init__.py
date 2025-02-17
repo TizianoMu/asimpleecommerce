@@ -1,23 +1,19 @@
+from flask_migrate import Migrate
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager
-from flask_cors import CORS
-from .config import Config
-
-db = SQLAlchemy()
-jwt = JWTManager()
-
+from .models import db
+from .routes import routes_bp
 def create_app():
+    """Initialize the Flask app."""
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = "your_secret_key"
 
+    # Initialize the db with the app
     db.init_app(app)
-    Migrate(app, db)
-    jwt.init_app(app)
-    CORS(app)
 
-    from .auth import auth_bp
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    # Register routes blueprint
+    app.register_blueprint(routes_bp)
 
     return app
