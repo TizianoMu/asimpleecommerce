@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#register-form-container {
+    width: 30%
+}
+
+.register-flashed-message {
+    font-size: 12px;
+    text-align: center;
+}
+
+p.success.register-flashed-message {
+    font-size: 12px;
+    color: rgb(4, 114, 15);
+    text-align: center;
+}
+
+p.danger.register-flashed-message {
+    font-size: 12px;
+    color: rgb(158, 7, 7);
+    text-align: center;
+}
+
+#login-form {
+    width: 30%
+}
