@@ -1,57 +1,29 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% include 'base.html' %}
     <title>Register</title>
 </head>
 <body>
-    <div class="container-fluid" id="register-form-container">
+    <div class="container-fluid auth-form-container">
         <h2>Register</h2>
-        <form id="register-form">
+        <form id="register-form" data-url="{{ url_for('auth.register') }}" data-login-url="{{ url_for('auth.login') }}">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
-                <input type="text" name="name" class="form-control" placeholder="Full Name" aria-label="name" aria-describedby="basic-addon1" required>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Full Name" aria-label="name" aria-describedby="basic-addon1" required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope"></i></span>
-                <input type="email" name="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1" required>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1" required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1"><i class="fa fa-key"></i></span>
-                <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required>
             </div>
             <div id="messages"></div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary auth-button">Register</button>
         </form>
         <p class="text-center">Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
     </div>
-    <script>
-        $(document).ready(function() {
-            $('#register-form').submit(function(e) {
-                e.preventDefault(); // Evita il submit normale del form
-
-                // Prepara i dati del form
-                var formData = $(this).serialize();
-
-                // Invia la richiesta AJAX
-                $.ajax({
-                    type: "POST",
-                    url: "{{ url_for('auth.register') }}", // Usa la URL del tuo endpoint
-                    data: formData,
-                    success: function(response) {
-                        // In caso di successo, mostra il messaggio
-                        $('#messages').html(`<p class="success register-flashed-message">Registration successful! <a href="{{ url_for('auth.login') }}">Go to Login</a></p>`);
-                    },
-                    error: function(xhr) {
-                        // Mostra gli errori nel div 'messages'
-                        var errorMessage = JSON.parse(xhr.responseText);
-                        $('#messages').html(`<p class="danger register-flashed-message">${errorMessage}</p>`);
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

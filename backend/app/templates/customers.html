@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    {% include 'base.html' %}
+    <title>Customers</title>
+</head>
+<body>
+    <h1>Customers</h1>
+
+    <!-- Form per aggiungere un cliente -->
+    <form method="POST">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <button type="submit">Add Customer</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>
+                <a href="{{ url_for('admin.delete_customer', id=customer.id) }}" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

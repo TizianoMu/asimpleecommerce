@@ -1,7 +1,7 @@
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from .models import db, User
+from flask import Blueprint, render_template, request, url_for, jsonify, make_response
+from flask_jwt_extended import create_access_token,set_access_cookies,create_refresh_token, jwt_required, get_jwt_identity, unset_jwt_cookies,set_refresh_cookies
+from ..models import db, User
 from flask_bcrypt import Bcrypt
 from datetime import datetime,timedelta
 
@@ -14,20 +14,31 @@ TEMP_EMAIL_DOMAINS = ["tempmail.com", "10minutemail.com", "disposablemail.com"]
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        remember = request.form.get("remember")
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON"}), 400
+
+        email = data.get("email")
+        password = data.get("password")
+        remember = data.get("remember")
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
             expires = timedelta(days=30) if remember else timedelta(hours=1)
             access_token = create_access_token(identity=user.id, expires_delta=expires)
+            refresh_token = create_refresh_token(identity=user.id)
             # Update last_login field
             user.last_login = datetime.utcnow()
             db.session.commit()
-            return jsonify({"access_token": access_token}), 200
-            #return redirect(url_for("routes.home"))  # Reindirizza alla home
+            response = jsonify({
+                "msg": "Login successful",
+                "redirect_url": url_for("admin.dashboard")
+            })
+            
+            set_access_cookies(response, access_token)
+            set_refresh_cookies(response, refresh_token)
+            return response
         
-        return jsonify("Invalid email or password", "danger"),401
+        return jsonify({"error":"Invalid email or password"}),401
 
     return render_template("login.html")
 
@@ -46,11 +57,13 @@ def is_strong_password(password):
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        password = request.form["password"]
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON"}), 400
 
-        errors = []
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
         # Check if email is valid and not temporary
         if not is_valid_email(email):
             return jsonify("Invalid or temporary email address."),400
@@ -73,8 +86,14 @@ def register():
 
     return render_template("register.html")
 
-@auth_bp.route("/protected", methods=["GET"])
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"message": "Logged out"})
+    unset_jwt_cookies(response)  # Delete JWT token from cookies
+    return response
+
+@auth_bp.route("/verify", methods=["GET"])
 @jwt_required()
-def protected():
+def verify():
     current_user = get_jwt_identity()
     return jsonify({"message": f"Access granted for user {current_user}"}), 200

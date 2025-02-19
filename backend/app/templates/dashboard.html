@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    {% include 'base.html' %}
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <ul>
+        <li><a href="{{ url_for('admin.customers') }}">Customers</a></li>
+        <li><a href="{{ url_for('admin.products') }}">Products</a></li>
+        <li><a href="{{ url_for('admin.categories') }}">Categories</a></li>
+    </ul>
+</body>
+</html>
