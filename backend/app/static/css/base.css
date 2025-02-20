@@ -4,6 +4,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-color: #f8f9fa;
 }
 
 .auth-button {
@@ -24,4 +25,77 @@ p.danger-auth-message {
     font-size: 12px;
     color: rgb(158, 7, 7);
     text-align: center;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+.dashboard-item {
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #005d5f;
+    cursor: pointer;
+    transition: all 1s ease;
+    position: relative;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+        7px 7px 20px 0px rgba(0, 0, 0, .1),
+        4px 4px 5px 0px rgba(0, 0, 0, .1);
+    outline: none;
+    border: none;
+    z-index: 1;
+}
+
+.dashboard-item a {
+    display: block;
+    text-decoration: none;
+    font-size: 1.2em;
+    transition: color 0.3s ease;
+    color:#eee
+}
+
+.animated-gradient:after {
+    position: absolute;
+    content: "";
+    width: 0;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: -1;
+    background-color: #222;
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+        7px 7px 20px 0px rgba(0, 0, 0, .1),
+        4px 4px 5px 0px rgba(0, 0, 0, .1);
+    transition: all 1s ease;
+}
+
+.animated-gradient:hover {
+    color: #fff;
+}
+
+.animated-gradient:hover:after {
+    left: 0;
+    width: 100%;
+}
+
+.animated-gradient:active {
+    top: 2px;
+}
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #222;
+    width: 100%;
+}
+
+.top-nav a {
+    color: #eee;
+    text-decoration: none;
+    margin-left: 15px;
 }
