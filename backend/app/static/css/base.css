@@ -9,6 +9,14 @@ body {
 
 .auth-button {
     width: 100%;
+    background: #9e0217;
+    color: white;
+}
+
+.auth-button:hover {
+    border: 1px solid #9e0217;
+    color: #9e0217;
+    background: white;
 }
 
 .auth-form-container {
@@ -16,15 +24,13 @@ body {
 }
 
 p.success-auth-message {
-    font-size: 12px;
+    font-size: 13px;
     color: rgb(4, 114, 15);
-    text-align: center;
 }
 
 p.danger-auth-message {
-    font-size: 12px;
+    font-size: 13px;
     color: rgb(158, 7, 7);
-    text-align: center;
 }
 
 .content {
@@ -34,16 +40,13 @@ p.danger-auth-message {
 
 .dashboard-item {
     color: #fff;
-    border-radius: 8px;
+    border-radius: 0;
     padding: 20px;
     margin-bottom: 20px;
-    background: #005d5f;
+    background-color: #9e0217;
     cursor: pointer;
     transition: all 1s ease;
     position: relative;
-    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
-        7px 7px 20px 0px rgba(0, 0, 0, .1),
-        4px 4px 5px 0px rgba(0, 0, 0, .1);
     outline: none;
     border: none;
     z-index: 1;
@@ -54,7 +57,7 @@ p.danger-auth-message {
     text-decoration: none;
     font-size: 1.2em;
     transition: color 0.3s ease;
-    color:#eee
+    color: #eee
 }
 
 .animated-gradient:after {
@@ -65,11 +68,8 @@ p.danger-auth-message {
     top: 0;
     right: 0;
     z-index: -1;
-    background-color: #222;
-    border-radius: 5px;
-    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
-        7px 7px 20px 0px rgba(0, 0, 0, .1),
-        4px 4px 5px 0px rgba(0, 0, 0, .1);
+    background: #222;
+    border-radius: 0;
     transition: all 1s ease;
 }
 
@@ -85,6 +85,7 @@ p.danger-auth-message {
 .animated-gradient:active {
     top: 2px;
 }
+
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -93,9 +94,81 @@ p.danger-auth-message {
     background-color: #222;
     width: 100%;
 }
-
 .top-nav a {
     color: #eee;
     text-decoration: none;
     margin-left: 15px;
+}
+.logout-btn {
+    color: #eee;
+    text-decoration: none;
+    margin-left: 15px;
+    background: none;
+    border:0px
+}
+
+.center-link {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.admin-page-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.admin-page-page .content {
+    flex: 1;
+    padding: 20px;
+}
+
+.admin-page-form input,
+.admin-page-form select,
+.admin-page-form button {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.admin-page-form button {
+    background-color: #9e0217;
+    color: white;
+    cursor: pointer;
+}
+
+.admin-page-form button:hover {
+    background-color: #7a0111;
+}
+
+.admin-page-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.admin-page-table th,
+.admin-page-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.admin-page-table th {
+    background-color: #f2f2f2;
+}
+
+.admin-page-delete-link,
+.admin-page-edit-link {
+    text-decoration: none;
+}
+
+.admin-page-delete-link:hover,
+.admin-page-edit-link:hover
+ {
+    text-decoration: underline;
 }

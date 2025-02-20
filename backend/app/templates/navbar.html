@@ -1,4 +1,9 @@
 <div class="top-nav">
-    <a href=><i class="fas fa-user"></i> Area Personale</a>
-    <a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="#"><i class="fas fa-user"></i></a>
+    <div class="center-link">
+        <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-dashboard"></i></a>
+    </div>
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="logout-btn" type="submit"><i class="fas fa-sign-out-alt"></i></button>
+    </form>
 </div>

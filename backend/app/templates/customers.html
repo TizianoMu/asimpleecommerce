@@ -4,33 +4,37 @@
     {% include 'base.html' %}
     <title>Customers</title>
 </head>
-<body>
-    <h1>Customers</h1>
+<body class="admin-page-page">
+    {% include "navbar.html" %}
 
-    <!-- Form per aggiungere un cliente -->
-    <form method="POST">
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <button type="submit">Add Customer</button>
-    </form>
+    <div class="container-fluid content">
+        <h1>Customers</h1>
 
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-        {% for customer in customers %}
-        <tr>
-            <td>{{ customer.id }}</td>
-            <td>{{ customer.name }}</td>
-            <td>{{ customer.email }}</td>
-            <td>
-                <a href="{{ url_for('admin.delete_customer', id=customer.id) }}" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+        <form id="addCustomerForm" class="admin-page-form" data-url="{{ url_for('admin.customers') }}">
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <button type="submit">Add Customer</button>
+        </form>
+        <div id="messages"></div>
+        <table class="admin-page-table">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.id }}</td>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.email }}</td>
+                <td>
+                    <a class="admin-page-edit-link btn btn-outline-primary" href="{{ url_for('admin.edit_customer', id=customer.id) }}" onclick=""><i class="fa fa-edit"></i></a>
+                    <a class="admin-page-delete-link btn btn-outline-danger" href="{{ url_for('admin.delete_customer', id=customer.id) }}" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

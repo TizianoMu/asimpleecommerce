@@ -4,29 +4,32 @@
     {% include 'base.html' %}
     <title>Categories</title>
 </head>
-<body>
-    <h1>Categories</h1>
+<body class="admin-page-page">
+    {% include "navbar.html" %}
 
-    <form method="POST">
-        <input type="text" name="name" placeholder="Category Description" required>
-        <button type="submit">Add Category</button>
-    </form>
-
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-        {% for category in categories %}
-        <tr>
-            <td>{{ category.id }}</td>
-            <td>{{ category.name }}</td>
-            <td>
-                <a href="{{ url_for('admin.delete_category', id=category.id) }}" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i> Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container-fluid content">
+        <h1>Categories</h1>
+        <form id="addCategoryForm" class="admin-page-form" data-url="{{ url_for('admin.categories') }}">
+            <input type="text" name="name" placeholder="Category Name" required>
+            <button type="submit">Add Category</button>
+        </form>
+        <table class="admin-page-table">
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            {% for category in categories %}
+            <tr>
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>
+                    <a class="admin-page-edit-link btn btn-outline-primary" onclick=""><i class="fa fa-edit"></i></a>
+                    <a class="admin-page-delete-link btn btn-outline-danger" href="{{ url_for('admin.delete_category', id=category.id) }}" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

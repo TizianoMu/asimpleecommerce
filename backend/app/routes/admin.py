@@ -1,6 +1,30 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash,jsonify
 from ..models import db, Customer, Product, Category
 from flask_jwt_extended import jwt_required
+from flask_marshmallow import Marshmallow
+from marshmallow import fields
+
+ma = Marshmallow()
+
+class CustomerSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "name", "email", "created_at")
+
+customer_schema = CustomerSchema(many=True)
+
+class CategorySchema(ma.Schema):
+    class Meta:
+        fields = ("id", "name")
+
+category_schema = CategorySchema(many=True)
+
+class ProductSchema(ma.Schema):
+    category = fields.Nested(CategorySchema(many=False))
+    class Meta:
+        fields = ("id", "name", "price", "category_id", "category")
+
+product_schema = ProductSchema(many=True)
+
 admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.route("/dashboard")
@@ -8,17 +32,32 @@ admin_bp = Blueprint("admin", __name__)
 def dashboard():
     return render_template("dashboard.html")
 
+#START Categories
 @admin_bp.route("/categories", methods=["GET", "POST"])
 @jwt_required()
 def categories():
     if request.method == "POST":
-        name = request.form["name"]
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON"}), 400
+        name = data.get("name")
+        existing_category = Category.query.filter_by(name=name).first()
+        if existing_category:
+            return jsonify({"error": "Category already exists"}), 400
         new_category = Category(name=name)
         db.session.add(new_category)
         db.session.commit()
-        flash("Category added!", "success")
-        return redirect(url_for("admin.categories"))
+        categories = Category.query.all()
+        result = category_schema.dump(categories) #use marshmallow to serialize
 
+        response = jsonify({
+            "msg": "Category added",
+            "redirect_url": url_for("admin.categories"),
+            "categories": result #result is a list of dicts
+        })
+
+        return response
+    
     categories = Category.query.all()
     return render_template("categories.html", categories=categories)
 
@@ -31,17 +70,35 @@ def delete_category(id):
     flash("Category deleted!", "danger")
     return redirect(url_for("admin.categories"))
 
+#END Categories
+
+#START Customers
 @admin_bp.route("/customers", methods=["GET", "POST"])
 @jwt_required()
 def customers():
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON"}), 400
+        name = data.get("name")
+        email = data.get("email")
+        existing_customer = Customer.query.filter_by(email=email).first()
+        if existing_customer:
+            return jsonify({"error": "Email already exists"}), 400
+
         new_customer = Customer(name=name, email=email)
         db.session.add(new_customer)
         db.session.commit()
-        flash("Customer added!", "success")
-        return redirect(url_for("admin.customers"))
+        customers = Customer.query.all()
+        result = customer_schema.dump(customers) #use marshmallow to serialize
+
+        response = jsonify({
+            "msg": "Customer added",
+            "redirect_url": url_for("admin.customers"),
+            "customers": result #result is a list of dicts
+        })
+
+        return response
 
     customers = Customer.query.all()
     return render_template("customers.html", customers=customers)
@@ -55,19 +112,36 @@ def delete_customer(id):
     flash("Customer deleted!", "danger")
     return redirect(url_for("admin.customers"))
 
+#END Customers
+
+#START Products
 @admin_bp.route("/products", methods=["GET", "POST"])
 @jwt_required()
 def products():
     if request.method == "POST":
-        name = request.form["name"]
-        price = float(request.form["price"])
-        category_id = int(request.form["category_id"])
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON"}), 400
+        name = data.get("name")
+        price = float(data.get("price"))
+        category_id = int(data.get("category_id"))
 
         new_product = Product(name=name, price=price, category_id=category_id)
         db.session.add(new_product)
         db.session.commit()
-        flash("Prodotto aggiunto con successo!", "success")
-        return redirect(url_for("admin.products"))
+        products = Product.query.all()
+        result_products = product_schema.dump(products) #use marshmallow to serialize
+        categories = Category.query.all()
+        result_categories = category_schema.dump(categories)
+
+        response = jsonify({
+            "msg": "Product added",
+            "redirect_url": url_for("admin.products"),
+            "products": result_products,
+            "categories": result_categories,
+        })
+
+        return response
 
     products = Product.query.all()
     categories = Category.query.all()
@@ -81,3 +155,5 @@ def delete_product(id):
     db.session.commit()
     flash("Prodotto eliminato!", "danger")
     return redirect(url_for("admin.products"))
+
+#END Products

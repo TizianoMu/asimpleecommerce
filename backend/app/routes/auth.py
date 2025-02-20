@@ -31,6 +31,8 @@ def login():
             db.session.commit()
             response = jsonify({
                 "msg": "Login successful",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
                 "redirect_url": url_for("admin.dashboard")
             })
             
@@ -87,6 +89,7 @@ def register():
     return render_template("register.html")
 
 @auth_bp.route("/logout", methods=["POST"])
+@jwt_required()
 def logout():
     response = jsonify({"message": "Logged out"})
     unset_jwt_cookies(response)  # Delete JWT token from cookies
