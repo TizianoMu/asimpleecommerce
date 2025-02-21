@@ -7,7 +7,7 @@
 <body>
     <div class="container-fluid auth-form-container">
         <h2>Register</h2>
-        <form id="register-form" data-url="{{ url_for('auth.register') }}" data-login-url="{{ url_for('auth.login') }}">
+        <form id="register-form" data-url="{{ url_for('auth.register') }}" data-success-message="Registration successful! <a href={{ url_for('auth.login') }}>Go to Login</a>">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
                 <input type="text" name="name" id="name" class="form-control" placeholder="Full Name" aria-label="name" aria-describedby="basic-addon1" required>

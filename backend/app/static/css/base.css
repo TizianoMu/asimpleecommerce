@@ -172,3 +172,14 @@ p.danger-auth-message {
  {
     text-decoration: underline;
 }
+
+.inline-buttons form,
+.inline-buttons a {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.full-width {
+    display: block;
+    width: 100%;
+}
