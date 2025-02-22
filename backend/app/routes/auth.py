@@ -33,7 +33,7 @@ def login():
                 "msg": "Login successful",
                 "access_token": access_token,
                 "refresh_token": refresh_token,
-                "redirect_url": url_for("admin.dashboard")
+                "redirect_url": url_for("admin.home")
             })
             
             set_access_cookies(response, access_token)

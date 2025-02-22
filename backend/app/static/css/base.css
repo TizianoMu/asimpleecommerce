@@ -37,7 +37,7 @@ p.danger-auth-message {
     padding: 20px;
 }
 
-.dashboard-item {
+.home-item {
     color: #fff;
     border-radius: 0;
     padding: 20px;
@@ -51,7 +51,7 @@ p.danger-auth-message {
     z-index: 1;
 }
 
-.dashboard-item a {
+.home-item a {
     display: block;
     text-decoration: none;
     font-size: 1.2em;

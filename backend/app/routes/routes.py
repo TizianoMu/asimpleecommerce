@@ -6,9 +6,9 @@ routes_bp = Blueprint("routes", __name__)
 @routes_bp.route("/")
 @jwt_required()
 def home():
-    return render_template("dashboard.html")
+    return render_template("home.html")
 
-@admin_bp.route("/dashboard")
+@admin_bp.route("/home")
 @jwt_required()
-def dashboard():
-    return render_template("dashboard.html")
+def home():
+    return render_template("home.html")

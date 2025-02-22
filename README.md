@@ -7,9 +7,7 @@
 ## Features
 
 - **User Authentication**: Login and registration system with JWT-based authentication.
-- **Customer Management**: View and manage customer information.
-- **Product Management**: Add, update, and delete products.
-- **Category Management**: Organize products into categories.
+- **Common Management**: Add, update, and delete resources.
 - **Dynamic Modals**: Use Bootstrap modals to handle form submissions dynamically.
 - **Session Handling**: Cookie-based authentication using JWT tokens.
 
@@ -35,9 +33,7 @@ asimpleecommerce/
 │   │   │   ├── routes.py
 │   │   │   ├── __init__.py
 │   │   │   ├── admin/
-│   │   │   │   ├── categories.py
-│   │   │   │   ├── customers.py
-│   │   │   │   ├── products.py
+│   │   │   │   ├── __init__.py
 │   │   │   │   ├── schemas.py
 │   │   ├── static/
 │   │   │   ├── css/
@@ -49,14 +45,11 @@ asimpleecommerce/
 │   │   ├── templates/
 │   │   │   ├── admin/
 │   │   │   │   ├── common_admin.html
-│   │   │   │   ├── categories.py
-│   │   │   │   ├── customers.py
-│   │   │   │   ├── products.py
 │   │   │   ├── auth/
 │   │   │   │   ├── login.html
 │   │   │   │   ├── register.py
 │   │   │   ├── base.html
-│   │   │   ├── dashboard.html
+│   │   │   ├── home.html
 │   │   │   ├── dynamic_modal.html
 │   │   │   ├── navbar.html
 │   ├── migrations/
@@ -111,5 +104,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Contributors
 
-- Tiziano Murzio ([tizzyduemila@gmail.com](mailto\:tizzyduemila@gmail.com))
+- Tiziano Murzio ([tiziano.murzio@outlook.it](mailto\:tiziano.murzio@outlook.it))
 

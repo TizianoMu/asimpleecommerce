@@ -1,7 +1,7 @@
 <div class="top-nav">
     <a href="#"><i class="fas fa-user"></i></a>
     <div class="center-link">
-        <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-home"></i></a>
+        <a href="{{ url_for('admin.home') }}"><i class="fas fa-home"></i></a>
     </div>
     <form action="{{ url_for('auth.logout') }}" method="POST">
         <button class="logout-btn" type="submit"><i class="fas fa-sign-out-alt"></i></button>
