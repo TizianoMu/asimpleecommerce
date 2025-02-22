@@ -47,15 +47,18 @@ asimpleecommerce/
 │   │   │   │   ├── dynamic_modal.js
 │   │   │   │   ├── form_manager.js
 │   │   ├── templates/
+│   │   │   ├── admin/
+│   │   │   │   ├── common_admin.html
+│   │   │   │   ├── categories.py
+│   │   │   │   ├── customers.py
+│   │   │   │   ├── products.py
+│   │   │   ├── auth/
+│   │   │   │   ├── login.html
+│   │   │   │   ├── register.py
 │   │   │   ├── base.html
-│   │   │   ├── categories.html
-│   │   │   ├── customers.html
 │   │   │   ├── dashboard.html
 │   │   │   ├── dynamic_modal.html
-│   │   │   ├── login.html
 │   │   │   ├── navbar.html
-│   │   │   ├── products.html
-│   │   │   ├── register.html
 │   ├── migrations/
 ```
 

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    {% include 'base.html' %}
+    <title>{{ resource.capitalize() }}</title>
+</head>
+<body class="admin-page-page">
+    {% include "navbar.html" %}
+
+    <div class="container-fluid content">
+        <h1>
+            {{ resource.capitalize() }} 
+            <select id="perPageSelect" class="form-control btn">
+                <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+            </select>
+            <button id="Add{{ resource[:-1].capitalize() }}Button" class="addResourceButton btn" title="Add {{ resource[:-1].capitalize() }}">
+                <i class="fas fa-plus"></i>
+            </button>
+        </h1>
+        <form id="add{{ resource[:-1].capitalize() }}Form" class="admin-page-form d-none" data-url="{{ url_for('admin.generic_admin_page', resource=resource) }}">
+            {% for field in resource_info.form_fields %}
+                <input type="{{ field[2] }}" name="{{ field[0] }}" placeholder="{{ field[1] }}" required>
+            {% endfor %}
+            <button type="submit">Add {{ resource[:-1].capitalize() }}</button>
+        </form>
+        <div id="messages"></div>
+        
+        <table class="table table-hover admin-page-table">
+            <tr>
+                {% for header in resource_info.table_headers %}
+                    <th>
+                        <a class="orderable-column" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.page, per_page=per_page, order_by=header.lower().replace(' ', '_'), order_direction='asc' if order_by != header.lower().replace(' ', '_') or order_direction == 'desc' else 'desc') }}">
+                            {{ header }}
+                        </a>
+                        {% if order_by == header.lower().replace(' ', '_') %}
+                            {% if order_direction == 'asc' %}
+                                <i class="fas fa-arrow-up"></i>
+                            {% else %}
+                                <i class="fas fa-arrow-down"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="fas fa-sort"></i>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+                <th>Actions</th>
+            </tr>
+            <tr id="filterRow">
+                <td></td>
+                {% for field in resource_info.form_fields %}
+                    <td>
+                        <input type="{{ field[2] }}" name="{{ field[0] }}" id="{{ field[0] }}" class="form-control filter-input" value="{{ request.args.get(field[0], '') }}">
+                    </td>
+                {% endfor %}
+                <td>
+                    <button type="button" id="filtersSubmitButton" class="btn btn-dark">Filter</button>
+                </td>
+            </tr>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    {% for field in resource_info.table_headers[1:] %}
+                        <td>{{ item[field.lower().replace(" ", "_")] }}</td>
+                    {% endfor %}
+                    <td class="inline-buttons">
+                        <form id="getForm" data-url="{{ url_for('admin.generic_edit', resource=resource) }}" data-method="GET" data-callback="showUpdatePopup" data-callback-redirect="{{ url_for('admin.generic_update', resource=resource, id=item.id) }}">
+                            <input type="hidden" name="id" value="{{ item.id }}">
+                            <button type="submit" class="admin-page-edit-link btn btn-outline-primary"><i class="fa fa-edit"></i></button>
+                        </form>
+                        <form id="deleteForm" data-url="{{ url_for('admin.generic_delete', resource=resource, id=item.id) }}" onclick="return confirm('Are you sure?')">
+                            <input type="hidden" name="id" value="{{ item.id }}">
+                            <button type="submit" class="admin-page-edit-link btn btn-outline-danger"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if pagination.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.prev_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">Previous</a></li>
+                {% endif %}
+                {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if pagination.page == page_num %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=page_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.next_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% include "dynamic_modal.html" %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const addButton = document.querySelector("#Add{{ resource[:-1].capitalize() }}Button");
+            const addForm = document.querySelector("#add{{ resource[:-1].capitalize() }}Form");
+
+            addButton.addEventListener("click", ()=>{
+                addButton.children[0].classList.toggle("fa-plus")
+                addButton.children[0].classList.toggle("fa-minus")
+                addForm.classList.toggle("d-none");
+            });
+        });
+        document.getElementById('perPageSelect').addEventListener('change', function() {
+            const perPage = this.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', perPage);
+            window.location.href = url.toString();
+        });
+        document.getElementById('filtersSubmitButton').addEventListener('click', function(event) {
+            event.preventDefault(); // Impedisce l'invio predefinito del form
+            const url = new URL(window.location.href);
+            const searchParams = url.searchParams;
+
+            // Rimuovi i parametri di filtro esistenti
+            {% for key in request.args %}
+                searchParams.delete('{{ key }}');
+            {% endfor %}
+
+            // Aggiungi i parametri di filtro dai campi di input
+            const filterInputs = document.querySelectorAll('.filter-input');
+            filterInputs.forEach(input => {
+                if (input.value) {
+                    searchParams.set(input.name, input.value);
+                }
+            });
+
+            window.location.href = url.toString();
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: #f8f9fa;
 }
 
@@ -127,7 +126,7 @@ p.danger-auth-message {
 
 .admin-page-form input,
 .admin-page-form select,
-.admin-page-form button {
+.admin-page-form button{
     margin-bottom: 10px;
     padding: 8px;
     border: 1px solid #ccc;
@@ -135,13 +134,15 @@ p.danger-auth-message {
     box-sizing: border-box;
 }
 
-.admin-page-form button {
+.admin-page-form button,
+.addResourceButton {
     background-color: #9e0217;
     color: white;
     cursor: pointer;
 }
 
-.admin-page-form button:hover {
+.admin-page-form button:hover,
+.addResourceButton:hover {
     background-color: #7a0111;
 }
 
@@ -182,4 +183,50 @@ p.danger-auth-message {
 .full-width {
     display: block;
     width: 100%;
+}
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+.orderable-column{
+    text-decoration: none;
+    color:#000
+}
+.orderable-column:hover{
+    text-decoration: underline;
+}
+
+span.page-link{
+    background: #9e0217 !important;
+    border: 1px solid #9e0217 !important;
+}
+.pagination>li>a {
+    background-color: white;
+    color: #9e0217;
+}
+
+.pagination>li>a:focus,
+.pagination>li>a:hover,
+.pagination>li>span:focus,
+.pagination>li>span:hover {
+    color: #5a5a5a;
+    background-color: #eee;
+    border-color: #ddd;
+}
+
+.pagination>.active>a {
+    color: white;
+    background-color: #9e0217 !Important;
+    border: solid 1px #9e0217 !Important;
+}
+
+.pagination>.active>a:hover {
+    background-color: #9e0217 !Important;
+    border: solid 1px #9e0217;
+}
+#perPageSelect{
+    width: 55px;
+    display: inline;
+    border: 1px solid;
+    text-align-last: center;
 }

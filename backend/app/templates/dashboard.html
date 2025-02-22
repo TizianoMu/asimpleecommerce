@@ -23,17 +23,17 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="dashboard-item text-center animated-gradient">
-                    <a href="{{ url_for('admin.customers') }}"><i class="fas fa-users mr-2"></i> Customers</a>
+                    <a href="{{ url_for('admin.generic_admin_page', resource='customers') }}"><i class="fas fa-users mr-2"></i> Customers</a>
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="dashboard-item text-center animated-gradient">
-                    <a href="{{ url_for('admin.products') }}"><i class="fas fa-box-open mr-2"></i> Products</a>
+                    <a href="{{ url_for('admin.generic_admin_page', resource='products') }}"><i class="fas fa-box-open mr-2"></i> Products</a>
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="dashboard-item text-center animated-gradient">
-                    <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags mr-2"></i> Categories</a>
+                    <a href="{{ url_for('admin.generic_admin_page', resource='categories') }}"><i class="fas fa-tags mr-2"></i> Categories</a>
                 </div>
             </div>
         </div>

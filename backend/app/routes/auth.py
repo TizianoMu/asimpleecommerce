@@ -23,7 +23,7 @@ def login():
         remember = data.get("remember")
         user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            expires = timedelta(days=30) if remember else timedelta(hours=1)
+            expires = timedelta(days=30) if remember else timedelta(hours=3)
             access_token = create_access_token(identity=user.id, expires_delta=expires)
             refresh_token = create_refresh_token(identity=user.id)
             # Update last_login field
@@ -42,7 +42,7 @@ def login():
         
         return jsonify({"error":"Invalid email or password"}),401
 
-    return render_template("login.html")
+    return render_template("auth/login.html")
 
 def is_valid_email(email):
     """Check if email format is valid and not from a temporary service."""
@@ -86,7 +86,7 @@ def register():
 
         return jsonify({"message": "Registration successful!"}), 200
 
-    return render_template("register.html")
+    return render_template("auth/register.html")
 
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
