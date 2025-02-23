@@ -4,8 +4,8 @@ from flask_jwt_extended import JWTManager
 from .models import db
 from .routes.routes import routes_bp
 from .routes.auth import auth_bp
-from .routes.admin import admin_bp
-from .config import Config  # Importa la configurazione
+from .routes.admin import admin_bp,analytics_bp
+from .config import Config
 from .jwt_handlers import *
 jwt = JWTManager()
 
@@ -25,5 +25,6 @@ def create_app():
     app.register_blueprint(routes_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")
+    app.register_blueprint(analytics_bp, url_prefix="/admin")
 
     return app

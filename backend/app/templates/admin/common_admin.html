@@ -22,7 +22,16 @@
         </h1>
         <form id="add{{ resource[:-1].capitalize() }}Form" class="admin-page-form d-none" data-url="{{ url_for('admin.generic_admin_page', resource=resource) }}">
             {% for field in resource_info.form_fields %}
-                <input type="{{ field[2] }}" name="{{ field[0] }}" placeholder="{{ field[1] }}" required>
+                {% if field[3] == "input" %}
+                    <input type="{{ field[2] }}" {% if field[2] == "number" %}step=".01"{% endif %} name="{{ field[0] }}" placeholder="{{ field[1] }}"  required>
+                {% elif field[3] == "select" %}
+                    <select name="{{ field[0] }}" required>
+                        <option value="">All</option>
+                        {% for value, label in field[4] %}
+                            <option value="{{value}}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
             {% endfor %}
             <button type="submit">Add {{ resource[:-1].capitalize() }}</button>
         </form>
@@ -52,7 +61,16 @@
                 <td></td>
                 {% for field in resource_info.form_fields %}
                     <td>
-                        <input type="{{ field[2] }}" name="{{ field[0] }}" id="{{ field[0] }}" class="form-control filter-input" value="{{ request.args.get(field[0], '') }}">
+                        {% if field[3] == "input" %}
+                            <input type="{{ field[2] }}" id="{{ field[0] }}" class="form-control filter-input" value="{{ request.args.get(field[0], '') }}" {% if field[2] == "number" %}step=".01"{% endif %} name="{{ field[0] }}" placeholder="{{ field[1] }}"  required>
+                        {% elif field[3] == "select" %}
+                            <select name="{{ field[0] }}" id="{{ field[0] }}" class="form-control filter-input" value="{{ request.args.get(field[0], '') }}" required>
+                                <option value="">All</option>
+                                {% for value, label in field[4] %}
+                                    <option value="{{value | int}}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
                     </td>
                 {% endfor %}
                 <td>
@@ -79,25 +97,47 @@
             {% endfor %}
         </table>
         <nav aria-label="Page navigation">
-            <ul class="pagination">
-                {% if pagination.has_prev %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.prev_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">Previous</a></li>
-                {% endif %}
-                {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
-                    {% if page_num %}
-                        {% if pagination.page == page_num %}
-                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
-                        {% else %}
-                            <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=page_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">{{ page_num }}</a></li>
-                        {% endif %}
+           <ul class="pagination">
+            {% set query_params = request.args.copy() %}
+            {% set _ = query_params.pop('page', None) %}
+            {% set _ = query_params.pop('per_page', None) %}
+            {% set _ = query_params.pop('order_by', None) %}
+            {% set _ = query_params.pop('order_direction', None) %}
+
+            {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.prev_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **query_params) }}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if pagination.page == page_num %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
                     {% else %}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=page_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **query_params) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
                     {% endif %}
-                {% endfor %}
-                {% if pagination.has_next %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.next_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **request.args) }}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
                 {% endif %}
-            </ul>
+            {% endfor %}
+
+            {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin.generic_admin_page', resource=resource, page=pagination.next_num, per_page=per_page, order_by=order_by, order_direction=order_direction, **query_params) }}">
+                        Next
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+
         </nav>
     </div>
     {% include "dynamic_modal.html" %}

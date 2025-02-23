@@ -5,6 +5,7 @@ function cloneFormAndAddListener(formName, editformName, dataUrl) {
     form.id = editformName;
     form.method = 'POST';
     form.dataset.url = dataUrl;
+    form.classList.remove('d-none')
     form.removeAttribute("onsubmit"); // Remove any pre-existing onsubmit attributes
 
     // Add the submit event listener to the cloned form

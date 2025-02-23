@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    {% include 'base.html' %}
+    <title>Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-page-page">
+    {% include "navbar.html" %}
+
+    <div class="container-fluid content">
+        <h1>Analytics Dashboard</h1>
+        {% if data %}
+            <div id="analytics-container">
+                <canvas id="productsPerCategoryChart"></canvas>
+            </div>
+
+            <script>
+                const productsPerCategory = {{ data.products_per_category|tojson }};
+                const labels = Object.keys(productsPerCategory);
+                const values = Object.values(productsPerCategory);
+
+                const ctx = document.getElementById('productsPerCategoryChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Products per Category',
+                            data: values,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+        {% elif error %}
+            <p style="color:red;">{{ error }}</p>
+        {% else %}
+            <p>No data available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
