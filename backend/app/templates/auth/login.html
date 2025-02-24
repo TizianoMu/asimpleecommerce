@@ -24,7 +24,10 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1"><i class="fa fa-key"></i></span>
-                <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required>
+                <button class="btn btn-outline-dark" type="button" id="togglePassword">
+                    <i class="fa fa-eye"></i>
+                </button>
             </div>
             <div class="input-group mb-3">
                 <label>
@@ -37,4 +40,19 @@
         <p class="text-center">Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
     </div>
 </body>
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        let passwordInput = document.getElementById('password');
+        let icon = this.querySelector('i');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    });
+</script>
 </html>

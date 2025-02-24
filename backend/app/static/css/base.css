@@ -230,3 +230,11 @@ span.page-link{
     border: 1px solid;
     text-align-last: center;
 }
+.analytics-chart{
+    max-height: 400px;
+}
+
+.disabled>.page-link,
+.page-link.disabled {
+    color: #fff;
+}

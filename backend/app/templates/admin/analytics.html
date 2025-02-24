@@ -11,23 +11,30 @@
     <div class="container-fluid content">
         <h1>Analytics Dashboard</h1>
         {% if data %}
-            <div id="analytics-container">
-                <canvas id="productsPerCategoryChart"></canvas>
+            <div id="analytics-container" class="row">
+                <div class="col-sm-12 col-md-6 analytics-chart">
+                    <canvas id="productsPerCategoryChart"></canvas>
+                </div>
+                <div class="col-sm-12 col-md-6 analytics-chart">
+                    <label class="text-center">Products per price range</label class="text-center">
+                    <canvas id="productsPerPriceRangeChart"></canvas>
+                </div>
             </div>
 
             <script>
+                // Products per Category Chart
                 const productsPerCategory = {{ data.products_per_category|tojson }};
-                const labels = Object.keys(productsPerCategory);
-                const values = Object.values(productsPerCategory);
+                const labelsCategory = Object.keys(productsPerCategory);
+                const valuesCategory = Object.values(productsPerCategory);
 
-                const ctx = document.getElementById('productsPerCategoryChart').getContext('2d');
-                new Chart(ctx, {
+                const ctxCategory = document.getElementById('productsPerCategoryChart').getContext('2d');
+                new Chart(ctxCategory, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: labelsCategory,
                         datasets: [{
                             label: 'Products per Category',
-                            data: values,
+                            data: valuesCategory,
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
@@ -41,9 +48,39 @@
                         }
                     }
                 });
+
+                // Products per Price Range Chart
+                const productsPerPriceRange = {{ data.products_per_price_range|tojson }};
+                const labelsPrice = Object.keys(productsPerPriceRange);
+                const valuesPrice = Object.values(productsPerPriceRange);
+
+                const ctxPrice = document.getElementById('productsPerPriceRangeChart').getContext('2d');
+                new Chart(ctxPrice, {
+                    type: 'pie',
+                    data: {
+                        labels: labelsPrice,
+                        datasets: [{
+                            label: 'Products per Price Range',
+                            data: valuesPrice,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    }
+                });
             </script>
         {% elif error %}
-            <p style="color:red;">{{ error }}</p>
+            <p class="messages">{{ error }}</p>
         {% else %}
             <p>No data available.</p>
         {% endif %}

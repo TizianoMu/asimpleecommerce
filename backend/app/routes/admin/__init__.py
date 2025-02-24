@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, url_for, flash, redirect
 from flask_jwt_extended import jwt_required
-from ...models import db, Customer, Product, Category  # Importa i modelli
-from .schemas import CustomerSchema, CategorySchema, ProductSchema
+from ...models import db, Customer, Product, Category, User, Order, OrderItem, OrderStatus # Importa i modelli
+from .schemas import CustomerSchema, CategorySchema, ProductSchema, UserSchema, OrderSchema, OrderItemSchema, OrderStatusSchema
 from marshmallow import ValidationError
 from sqlalchemy import and_
 from sqlalchemy import Numeric, Float, Boolean, DateTime
@@ -17,25 +17,37 @@ def generic_admin_page(resource):
     Handles GET and POST requests for generic admin pages.
     """
     # Check if the resource is valid
-    if resource not in ["customers", "categories", "products"]:
+    if resource not in ["customers", "categories", "products", "users", "orders"]:
         return jsonify({"error": "Invalid resource"}), 404
 
     model_map = {
         "customers": Customer,
         "categories": Category,
         "products": Product,
+        "users": User,
+        "orders": Order,
+        "orderItems": OrderItem,
+        "orderStatus": OrderStatus
     }
 
     schema_map = {
         "customers": CustomerSchema,
         "categories": CategorySchema,
         "products": ProductSchema,
+        "users": UserSchema,
+        "orders": OrderSchema,
+        "orderItems": OrderItemSchema,
+        "orderStatus": OrderStatusSchema,
     }
 
     model = model_map[resource]
     schema = schema_map[resource](many=True)
 
     resource_info = {
+        "users": {
+            "form_fields": [("name", "Full Name", "text", "input"), ("email", "Email", "email", "input"), ("","","",""), ("","","",""), ("","","",""), ("is_active", "Is Active", "checkbox", "input"), ("is_admin", "Is Admin", "checkbox", "input")],
+            "table_headers": ["ID", "Name", "Email", "Created At", "Updated At", "Last Login", "Is Active", "Is Admin"],
+        },
         "customers": {
             "form_fields": [("name", "Full Name", "text", "input"), ("email", "Email", "email", "input")],
             "table_headers": ["ID", "Name", "Email"],
@@ -48,11 +60,22 @@ def generic_admin_page(resource):
             "form_fields": [("name", "Product Name", "text", "input"), ("price", "Price", "number", "input"), ("category_id", "Category ID", "number", "select",[])],
             "table_headers": ["ID", "Name", "Price", "Category"],
         },
+        "orders": {
+            "form_fields": [("customer_id", "Customer ID", "number", "select",[]), ("total_amount", "Total Amount", "number", "input"), ("status_id", "Status", "number", "select",[]), ("","","",""), ("","","",""),("","","","")],
+            "table_headers": ["ID", "Customer", "Total Amount", "Status", "Created At", "Updated At", "Items"],
+        },
     }
     if resource == "products":
         categories = Category.query.all()
         category_options = [(category.id, category.name) for category in categories]
         resource_info["products"]["form_fields"][2] = ("category_id", "Category ID", "number", "select", category_options)
+    if resource == "orders":
+        customers = Customer.query.all()
+        customer_options = [(customer.id, customer.name) for customer in customers]
+        resource_info["orders"]["form_fields"][0] = ("customer_id", "Customer ID", "number", "select", customer_options)
+        status = OrderStatus.query.all()
+        status_options = [(stat.id, stat.status) for stat in status]
+        resource_info["orders"]["form_fields"][2] = ("status_id", "Status ID", "number", "select", status_options)
 
     if request.method == "POST":
         try:
@@ -101,10 +124,6 @@ def generic_admin_page(resource):
         order_by = request.args.get('order_by', 'id')
         order_direction = request.args.get('order_direction', 'asc')
 
-        order_column = getattr(model, order_by)
-        if order_direction == 'desc':
-            order_column = order_column.desc()
-
         # Build filters based on query parameters
         filters = []
         for field in resource_info[resource]["form_fields"]:
@@ -131,32 +150,119 @@ def generic_admin_page(resource):
                         pass
 
         # Query the database with filters and ordering
-        query = model.query.filter(and_(*filters)).order_by(order_column)
+        if resource == "orders":
+            query = Order.query.join(Customer, Order.customer_id == Customer.id).join(OrderStatus, Order.status_id == OrderStatus.id).add_columns(Order.id, Customer.name.label("customer_name"), Order.total_amount, Order.status_id, OrderStatus.status.label("status_name"), Order.created_at, Order.updated_at).filter(and_(*filters))
+
+            if order_by == "status":
+                order_column = OrderStatus.status
+            elif order_by == "customer":
+                order_column = Customer.name
+            else:
+                order_column = getattr(Order, order_by)
+
+            if order_direction == 'desc':
+                order_column = order_column.desc()
+
+            query = query.order_by(order_column)
+
+        elif resource == "products":
+            query = Product.query.join(Category, Product.category_id == Category.id).add_columns(Product.id, Product.name, Product.price, Category.name.label("category_name")).filter(and_(*filters))
+
+            order_column = getattr(Product, order_by)
+            if order_direction == 'desc':
+                order_column = order_column.desc()
+            else:
+                order_column = order_column.asc()
+
+
+            query = query.order_by(order_column)
+        else:
+            order_column = getattr(model, order_by)
+            if order_direction == 'desc':
+                order_column = order_column.desc()
+            else:
+                order_column = order_column.asc()
+            query = model.query.filter(and_(*filters)).order_by(order_column)
 
         # Paginate the results
         pagination = query.paginate(page=page, per_page=per_page)
         items = pagination.items
 
-        # Modify the query for products to include category name
+        # Modify the items for products and orders
         if resource == "products":
-            query = Product.query.join(Category, Product.category_id == Category.id).add_columns(Product.id, Product.name, Product.price, Category.name.label("category_name")).filter(and_(*filters)).order_by(order_column)
-            pagination = query.paginate(page=page, per_page=per_page)
             items = [{"id": item.id, "name": item.name, "price": item.price, "category": item.category_name} for item in pagination.items]
-        else:
-            query = model.query.filter(and_(*filters)).order_by(order_column)
-            pagination = query.paginate(page=page, per_page=per_page)
-            items = pagination.items
+        elif resource == "orders":
+            #Set order items
+            query = (
+                Order.query
+                .join(Customer, Order.customer_id == Customer.id)
+                .join(OrderStatus, Order.status_id == OrderStatus.id)
+                .outerjoin(OrderItem, Order.id == OrderItem.order_id)
+                .outerjoin(Product, OrderItem.product_id == Product.id)
+                .add_columns(
+                    Order.id,
+                    Customer.name.label("customer_name"),
+                    Order.total_amount,
+                    Order.status_id,
+                    OrderStatus.status.label("status_name"),
+                    Order.created_at,
+                    Order.updated_at,
+                    db.func.string_agg(Product.name, ', ').label("products")  # Raggruppa i prodotti nel formato richiesto
+                )
+                .group_by(Order.id, Customer.name, Order.total_amount, Order.status_id, OrderStatus.status, Order.created_at, Order.updated_at)
+                .filter(and_(*filters))
+            )
 
+            # Order results
+            if order_by == "status":
+                order_column = OrderStatus.status
+            elif order_by == "customer":
+                order_column = Customer.name
+            else:
+                order_column = getattr(Order, order_by)
+
+            if order_direction == 'desc':
+                order_column = order_column.desc()
+
+            query = query.order_by(order_column)
+
+            #Paginate results
+            pagination = query.paginate(page=page, per_page=per_page)
+            items = [
+                {
+                    "id": item.id,
+                    "customer": item.customer_name,
+                    "total_amount": item.total_amount,
+                    "status_id": item.status_id,
+                    "status": item.status_name,
+                    "created_at": item.created_at,
+                    "updated_at": item.updated_at,
+                    "products": item.products if item.products else "N/A"
+                }
+                for item in pagination.items
+            ]
         # Render the template with the retrieved data
-        return render_template("admin/common_admin.html",
-                               items=items,
-                               resource=resource,
-                               resource_info=resource_info[resource],
-                               pagination=pagination,
-                               order_by=order_by,
-                               order_direction=order_direction,
-                               per_page=per_page,
-                               filters=request.args)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render_template("admin/common_admin.html",
+                items=items,
+                resource=resource,
+                resource_info=resource_info[resource],
+                pagination=pagination,
+                order_by=order_by,
+                order_direction=order_direction,
+                per_page=per_page,
+                filters=request.args,
+                axios_request=True)
+        else:
+            return render_template("admin/common_admin.html",
+                items=items,
+                resource=resource,
+                resource_info=resource_info[resource],
+                pagination=pagination,
+                order_by=order_by,
+                order_direction=order_direction,
+                per_page=per_page,
+                filters=request.args)
 
 @admin_bp.route("/<resource>/delete/<int:id>", methods=["POST"])
 @jwt_required()
@@ -168,6 +274,7 @@ def generic_delete(resource, id):
         "customers": Customer,
         "categories": Category,
         "products": Product,
+        "users": User,
     }
 
     # Check if the resource is valid

@@ -1,10 +1,26 @@
 <div class="top-nav">
-    <a href="#"><i class="fas fa-user"></i></a>
+    <div class="user-info-container position-relative">
+        <a href="#" class="user-icon" data-toggle="tooltip" title="{{ current_user.email if current_user else '' }}">
+            <i class="fas fa-user"></i>
+        </a>
+    </div>
     <div class="center-link">
-        <a href="{{ url_for('admin.home') }}"><i class="fas fa-home"></i></a>
+        <a href="{{ url_for('admin.home') }}">
+            <i class="fas fa-home"></i>
+        </a>
     </div>
     <form action="{{ url_for('auth.logout') }}" method="POST">
-        <button class="logout-btn" type="submit"><i class="fas fa-sign-out-alt"></i></button>
+        <button class="logout-btn" type="submit">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
     </form>
 </div>
-</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggers = document.querySelectorAll('[data-toggle="tooltip"]');
+
+        tooltipTriggers.forEach(function(trigger) {
+            new bootstrap.Tooltip(trigger);
+        });
+    });
+</script>

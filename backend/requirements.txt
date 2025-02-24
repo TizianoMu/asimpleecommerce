@@ -7,4 +7,5 @@ flask_bcrypt
 flask-marshmallow
 marshmallow-sqlalchemy
 pandas
+flask_login
 psycopg2-binary  # For PostgreSQL

@@ -36,6 +36,9 @@ def login():
 
         if not bcrypt.check_password_hash(user.password, password):
             return jsonify({"error": "Invalid email or password"}), 401
+        
+        if not user.is_admin:
+            return jsonify({"error": "Not Authorized"}), 401
 
         try:
             expires = timedelta(days=30) if remember else timedelta(hours=3)
