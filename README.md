@@ -10,6 +10,7 @@
 - **Common Management**: Add, update, and delete resources.
 - **Dynamic Modals**: Use Bootstrap modals to handle form submissions dynamically.
 - **Session Handling**: Cookie-based authentication using JWT tokens.
+- **KPI page**: A page for showing charts of sales data.
 
 ## Project Structure
 
@@ -34,6 +35,7 @@ asimpleecommerce/
 │   │   │   ├── __init__.py
 │   │   │   ├── admin/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── analytics.py
 │   │   │   │   ├── schemas.py
 │   │   ├── static/
 │   │   │   ├── css/
@@ -45,6 +47,7 @@ asimpleecommerce/
 │   │   ├── templates/
 │   │   │   ├── admin/
 │   │   │   │   ├── common_admin.html
+│   │   │   │   ├── analytics.html
 │   │   │   ├── auth/
 │   │   │   │   ├── login.html
 │   │   │   │   ├── register.py
